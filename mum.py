@@ -55,7 +55,7 @@ def on_release(key):
 
 def on_click(x, y, button, pressed):
     global logged_string,escape_pressed
-    write_to_file(logged_string +" ; " +f"mouse clicked at {x} {y}")
+    write_to_file(logged_string +" ; " +f"mouse clicked at {x} {y} with {button}")
     logged_string=""
     if escape_pressed:
         return False

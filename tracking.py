@@ -9,7 +9,7 @@ current_datetime = datetime.datetime.now()
 formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
 
 # Specify the folder path where you want to store the file
-folder_path = "/home/psyduck/Desktop/Log_File"
+folder_path = "./Logs"
 
 # Ensure the folder exists
 os.makedirs(folder_path, exist_ok=True)
@@ -34,46 +34,55 @@ def on_press(key):
     try:
         if key == keyboard.Key.esc:
             escape_pressed = True
-            # Log any pending input before exiting.
+            # Log any pending inp
+            current_keys.add(key)
             if logged_string or current_keys:
-                log_keys("Line Break: Escape Key")
+                log_keys()
+                current_keys=set()
+                logged_string=""
             return False
         elif key in [keyboard.Key.space, keyboard.Key.enter]:
             # Identify the line breaker key
-            line_breaker = "Space" if key == keyboard.Key.space else "Enter"
-            # Log as a line break if there's input; reset afterwards.
+            current_keys.add(key)
             if logged_string or current_keys:
-                log_keys(f"Line Break: {line_breaker} Key")
+                log_keys()
             logged_string = ""  # Prepare for new input.
         else:
             if hasattr(key, 'char'):
                 # Regular character keys are treated differently based on current state.
                 if current_keys:
                     # If modifier keys are held, log each press with them.
-                    logged_string = key.char
+                    current_keys.add(key)
                     log_keys()
                 else:
                     # Accumulate characters if no modifier is held.
                     logged_string += key.char
             else:
                 # For non-character keys (modifiers included), log immediately if there's existing input.
-                if logged_string or (key not in current_keys and current_keys):
+                if logged_string or (key not in current_keys):
                     current_keys.add(key)
                     log_keys()
                 else:
                     # Simply add modifier keys to the set if no prior input exists.
                     current_keys.add(key)
+                logged_string=""
+            
     except Exception as e:
         print(f"Error in on_press: {e}")
 
 def log_keys(message=""):
+    
     global current_keys, logged_string
     # Prepare the combination or single keys for logging
-    combo = ' + '.join([key.name for key in current_keys] + [logged_string.strip()]) if current_keys else logged_string
+    combo = ' + '.join([key.char if hasattr(key, 'char') else f"Key.{key.name}" for key in current_keys]
+) if current_keys else logged_string
     # Add the optional message if provided (for line breakers)
-    combo = f"{combo}; {message}" if message else combo
+    combo_string = f"{combo}; {message}"
+    if current_keys and logged_string.strip():
+        write_to_file(logged_string)
     if combo.strip():  # Ensure there's content to log
-        write_to_file(combo)
+        write_to_file(combo_string)
+    
 
 
 def on_release(key):
@@ -85,14 +94,14 @@ def on_click(x, y, button, pressed):
     global escape_pressed
     if pressed:
         log_keys()  # Log any keys before the click event
-        write_to_file('" ";'f"Mouse clicked at {x}, {y} with {button}")
+        write_to_file('" " ;'f"Mouse clicked at {x}, {y} with {button}")
     if escape_pressed:
         
         return False
 
 def on_scroll(x, y, dx, dy):
     log_keys()  # Log any keys before the scroll event
-    write_to_file(f"Mouse scrolled at {x}, {y} by {dx}, {dy}")
+    write_to_file('" " ;'f"Mouse scrolled at {x}, {y} by {dx}, {dy}")
     if escape_pressed:
         return False
 

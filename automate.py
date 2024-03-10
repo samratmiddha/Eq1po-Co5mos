@@ -27,6 +27,11 @@ def select_file(files):
             print("Invalid input. Please enter a number.")
 
 def main():
+
+    TIME_INTERVAL = 1
+    PIXELS_PER_CLICK = 0.8
+
+
     files = list_files_in_logs_folder()
     if not files:
         print("No files found in Logs folder.")
@@ -36,98 +41,119 @@ def main():
     file_path = os.path.join("Logs", selected_file)
     print(f"Selected file: {file_path}")
 
-    # Open the file
-    with open(file_path, 'r') as file:
-        # Read the lines
-        lines = file.readlines()
+    while True:
 
-        print(lines)
-
-        if (lines[-1].split(';')[0].find('.') != -1):
-            print("No alias found. Creating alias...")
-            alias_function(file_path)
-
-
-            with open(file_path, 'r') as file:
-                lines = file.readlines()
-            print(lines)
-
-
-        alias = ast.literal_eval(lines[-1].split(';')[1].strip())
-
-        # for i in range(len(alias)):
-
-        for sublist in alias:
+        # Open the file
+        with open(file_path, 'r') as file:
+            # Read the lines
+            lines = file.readlines()
 
             print(lines)
-            index = sublist[0]
-            value = sublist[1]
 
-            parts = lines[index].split(';')
-            parts[1] = value
-            lines[index] = ';'.join(parts)
+            if (lines[-1].split(';')[0].find('.') != -1):
+                print("No alias found. Creating alias...")
+                alias_function(file_path)
 
 
-
-        alias_values = set_alias(file_path)
-
-        for sublist in alias:
-            index = sublist[0]
-
-            value = alias_values[str(index)][1]
-            parts = lines[index].split(';')
-            parts[1] = value
-            lines[index] = ';'.join(parts)
+                with open(file_path, 'r') as file:
+                    lines = file.readlines()
+                print(lines)
 
 
+            alias = ast.literal_eval(lines[-1].split(';')[1].strip())
 
-        start_time = 0
-        # Process each line
-        for line in lines[:-1]:
-            print(line)
-            time.sleep(3)
-            parts = line.split(';')
-            timestamp_parts = parts[0].split(':')
-            timestamp = float(timestamp_parts[0])*3600 + float(timestamp_parts[1])*60 + float(timestamp_parts[2])
-            action = parts[2].strip()
-            keystrokes = parts[1].strip()
+            # for i in range(len(alias)):
 
-            print(action, keystrokes,"ACTION")
+            for sublist in alias:
 
-            if len(keystrokes) != 0:
-                pyautogui.write(keystrokes, interval=(timestamp-start_time)/len(keystrokes))
+                print(lines)
+                index = sublist[0]
+                value = sublist[1]
 
-                if action.split('.')[0] == 'Key':
-                    pyautogui.press(action.split('.')[1], interval=timestamp-start_time/len(keystrokes))
+                parts = lines[index].split(';')
+                parts[1] = value
+                lines[index] = ';'.join(parts)
 
-            elif action.split('.')[0] == 'Key':
-                pyautogui.press(action.split('.')[1], interval=timestamp-start_time)
 
-            elif action.split(' ')[0] == 'mouse' and action.split(' ')[1] == 'scrolled':
-                x, y = action.split(' ')[-5:-3]
-                dx, dy = action.split(' ')[-2:]
-                # pyautogui.scroll(int(dy), x=int(x), y=int(y))
-                print(x, y, dx, dy)
 
-                # pyautogui.moveTo(int(float(x)), int(float(y)))
-                pyautogui.vscroll(dx)
-                time.sleep(0.1)
-                pyautogui.hscroll(dy)
+            alias_values = set_alias(file_path)
 
-            elif action.split(' ')[0] == 'mouse' and action.split(' ')[1] == 'clicked':
-                print(action)
-                x_cord, y_cord = action.split(' ')[-4:-2]
-                print(x_cord, y_cord)
-                button_type = action.split(' ')[-1].split('.')[1]
-                print(button_type)
-                pyautogui.click(button=button_type, x = int(float(x_cord)), y = int(float(y_cord)), interval=timestamp-start_time)
+            for sublist in alias:
+                index = sublist[0]
 
-            elif action.split(' ')[0] == 'end':
+                value = alias_values[str(index)][1]
+                parts = lines[index].split(';')
+                parts[1] = value
+                lines[index] = ';'.join(parts)
+
+
+
+            start_time = 0
+            # Process each line
+            for line in lines[:-1]:
+                print(line)
+                parts = line.split(';')
+                timestamp_parts = parts[0].split(':')
+                timestamp = float(timestamp_parts[0])*3600 + float(timestamp_parts[1])*60 + float(timestamp_parts[2])
+                action = parts[2].strip()
+                keystrokes = parts[1].strip()
+
+                print(action, keystrokes, "ACTION")
+
+                if len(keystrokes) != 0:
+                    print(f'time interval: {(timestamp-start_time)/len(keystrokes)}')
+                    pyautogui.write(keystrokes, interval=((timestamp-start_time)/len(keystrokes)))
+
+                    if action.split('.')[0] == 'Key':
+                        pyautogui.press(action.split('.')[1], interval=(timestamp-start_time)/len(keystrokes))
+
+                elif action.split('.')[0] == 'Key':
+
+
+
+                    if '+' in action:
+                        key1 = action.split('+')[0].split('.')[1].strip()
+                        key2 = action.split('+')[1].split('.')[1] if '.' in action.split('+')[1] else action.split('+')[1].strip()
+
+                        print(key1, key2, "KEYS")
+                        pyautogui.hotkey(key1, key2)
+
+                    else:
+
+                        pyautogui.press(action.split('.')[1], interval=(timestamp-start_time))
+
+                elif action.split(' ')[0] == 'mouse' and action.split(' ')[1] == 'scrolled':
+                    x, y = action.split(' ')[-5:-3]
+                    dx, dy = action.split(' ')[-2:]
+                    # Convert from clicks to pixels
+                    dx_pixels = int(float(dx)) * PIXELS_PER_CLICK
+                    dy_pixels = int(float(dy)) * PIXELS_PER_CLICK
+                    # Scroll
+                    # time.sleep(timestamp - start_time)  # Add this line to introduce an interval
+                    pyautogui.moveTo(int(float(x)), int(float(y)))  # Move to the correct location
+                    pyautogui.scroll(dy_pixels)  # Scroll vertically
+                    pyautogui.hscroll(dx_pixels)  # Scroll horizontally
+                    print(x, y, dx_pixels, dy_pixels)
+
+                elif action.split(' ')[0] == 'mouse' and action.split(' ')[1] == 'clicked':
+                    print(action)
+                    x_cord, y_cord = action.split(' ')[-4:-2]
+                    print(x_cord, y_cord)
+                    button_type = action.split(' ')[-1].split('.')[1]
+                    print(button_type)
+                    pyautogui.click(button=button_type, x = int(float(x_cord)), y = int(float(y_cord)), interval=(timestamp-start_time))
+
+                elif action.split(' ')[0] == 'end':
+                    break
+
+                print(timestamp)
+
+                start_time = timestamp
+
+            user_input = input("Do you want to process the file again? (Press Enter to continue, or type 'exit' to exit): ")
+            if user_input.lower() == "exit":
                 break
 
-            print(timestamp)
-
-            start_time = timestamp
 
 if __name__ == "__main__":
     main()

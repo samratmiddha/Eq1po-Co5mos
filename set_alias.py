@@ -10,8 +10,8 @@ def set_alias(filename):
 
     while count:
         ct = 1
-        ind = ""
-        alias_name = ""
+        ind = ''
+        alias_name = ''
 
         while True:
             if line[1][index] == ",":
@@ -36,7 +36,9 @@ def set_alias(filename):
             alias_name += line[1][index]
             index += 1
 
-        alias_value = input(f"Enter value of '{alias_name}': ")
+        alias_name = alias_name.replace("'", "")
+
+        alias_value = input(f"Enter value of {alias_name}: ")
         aliases[ind] = [alias_name, alias_value]
         count -= 1
 

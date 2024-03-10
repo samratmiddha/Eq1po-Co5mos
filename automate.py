@@ -84,13 +84,15 @@ def main():
         start_time = 0
         # Process each line
         for line in lines[:-1]:
+            print(line)
+            time.sleep(3)
             parts = line.split(';')
             timestamp_parts = parts[0].split(':')
             timestamp = float(timestamp_parts[0])*3600 + float(timestamp_parts[1])*60 + float(timestamp_parts[2])
             action = parts[2].strip()
             keystrokes = parts[1].strip()
 
-            print(action, keystrokes)
+            print(action, keystrokes,"ACTION")
 
             if len(keystrokes) != 0:
                 pyautogui.write(keystrokes, interval=(timestamp-start_time)/len(keystrokes))
@@ -113,8 +115,12 @@ def main():
                 pyautogui.hscroll(dy)
 
             elif action.split(' ')[0] == 'mouse' and action.split(' ')[1] == 'clicked':
-                x, y = action.split(' ')[-2:]
-                pyautogui.click(int(float(x)), int(float(y)), interval=timestamp-start_time)
+                print(action)
+                x_cord, y_cord = action.split(' ')[-4:-2]
+                print(x_cord, y_cord)
+                button_type = action.split(' ')[-1].split('.')[1]
+                print(button_type)
+                pyautogui.click(button=button_type, x = int(float(x_cord)), y = int(float(y_cord)), interval=timestamp-start_time)
 
             elif action.split(' ')[0] == 'end':
                 break

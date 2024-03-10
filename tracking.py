@@ -74,12 +74,12 @@ def log_keys(message=""):
     
     global current_keys, logged_string
     # Prepare the combination or single keys for logging
-    combo = ' + '.join([key.char if hasattr(key, 'char') else f"Key.{key.name}" for key in current_keys]
+    combo = ' + '.join([key.char if hasattr(key, 'char') else str(key) for key in current_keys]
 ) if current_keys else logged_string
     # Add the optional message if provided (for line breakers)
-    combo_string = f"{combo}; {message}"
+    combo_string = f";{combo}; {message}"
     if current_keys and logged_string.strip():
-        write_to_file(logged_string)
+        write_to_file(f"{logged_string};")
     if combo.strip():  # Ensure there's content to log
         write_to_file(combo_string)
     
@@ -94,14 +94,15 @@ def on_click(x, y, button, pressed):
     global escape_pressed
     if pressed:
         log_keys()  # Log any keys before the click event
-        write_to_file('" " ;'f"Mouse clicked at {x}, {y} with {button}")
+        write_to_file(';'f"mouse clicked at {x} {y} with {button}")
     if escape_pressed:
         
         return False
 
 def on_scroll(x, y, dx, dy):
-    log_keys()  # Log any keys before the scroll event
-    write_to_file('" " ;'f"Mouse scrolled at {x}, {y} by {dx}, {dy}")
+    log_keys()
+    logged_string=""
+    write_to_file(';'f"mouse scrolled at {x} {y} by {dx} {dy}")
     if escape_pressed:
         return False
 
